@@ -28,13 +28,15 @@ int main()
 				line[21 * j + k] = buf[k];
 			line[21 * j + 20] = ' ';
 		}
-		printf("%s", line);
-		/*for (j = 0; j < 104; ++j)
+		for (j = 0; j < 104; ++j)
 		{
 			printf("%c", line[j]);
-
-		}*/
-		//printf("\n");
+		}
+		printf("\n");
+	}
+	for (i = 0; i < 5; ++i)
+	{
+		fclose(files[i]);
 	}
 	getchar();
 	return 0;
