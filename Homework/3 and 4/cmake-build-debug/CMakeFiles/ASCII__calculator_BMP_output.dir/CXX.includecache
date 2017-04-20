@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/Calculator.cpp
+Calculator.hpp
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/Calculator.hpp
+
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/Calculator.hpp
+printer.hpp
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/printer.hpp
+
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/main.cpp
+Calculator.hpp
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/Calculator.hpp
+
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/printer.cpp
+printer.hpp
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/printer.hpp
+
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/printer.hpp
+string
+-
+iostream
+-
+algorithm
+-
+vector
+-
+

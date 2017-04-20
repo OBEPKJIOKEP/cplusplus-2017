@@ -1,0 +1,3 @@
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/greg/CLionProjects/ASCII_ calculator_BMP_output/cmake-build-debug/CMakeFiles/ASCII__calculator_BMP_output.dir
