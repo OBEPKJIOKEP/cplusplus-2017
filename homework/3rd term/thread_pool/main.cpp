@@ -7,25 +7,42 @@
 //
 
 #include <iostream>
+#include <chrono>
+#include <sstream>
 #include "thread_pool.hpp"
 
-void f()
+using std::this_thread::sleep_for;
+
+func sleep(int secs)
 {
-    auto a = (struct timespec){.tv_sec=2};
-    nanosleep(&a, NULL);
-    {
-        //std::lock_guard<std::mutex> lg(io_mutex);
-        std::cout << "done\n";
-    }
-    
+
+    return [=]() {
+        std::cout << std::string("sleeping for ").append(std::to_string(secs)).append("\n");
+        sleep_for(std::chrono::seconds(secs));
+        std::cout << std::string("done ").append(std::to_string(secs)).append("\n");
+    };
 }
 
-int main(int argc, const char * argv[]) {
-    thread_pool a(3);
-    a.execute(f);
-    a.execute(f);
-    a.execute(f);
-    a.execute(f);
+
+int main(int argc, const char * argv[])
+{
+
+    thread_pool a(2);
+
+    func sleep1 = sleep(1);
+    func sleep2 = sleep(2);
+    func sleep3 = sleep(3);
+    func sleep15 = sleep(15);
+
+
+    a.execute(sleep1);
+    a.execute(sleep2);
+    a.execute(sleep3);
+    a.execute(sleep1);
+    a.execute(sleep2);
+    a.execute(sleep3);
+    a.execute(sleep15);
+    sleep15();
     return 0;
 }
 

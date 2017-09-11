@@ -17,17 +17,18 @@
 typedef std::function<void()> func;
 using std::thread;
 
-//std::mutex io_mutex;
-
-
 class thread_pool
 {
 public:
-    thread_pool(std::size_t);
+    explicit thread_pool(std::size_t);
     
-    thread_pool(thread_pool&);
-    
-    thread_pool& operator=(thread_pool&);
+    // no copy
+    thread_pool(const thread_pool&) =delete;
+    thread_pool& operator=(const thread_pool&) =delete;
+
+    // no move
+    thread_pool(thread_pool&&) =delete;
+    thread_pool& operator=(thread_pool&&) =delete;
     
     void execute(const func&);
     
@@ -38,5 +39,7 @@ private:
     std::queue<func> funcs;
     std::condition_variable cv;
     std::mutex m;
-    bool running = true;
+    std::atomic_bool running;
+    
+    void run();
 };

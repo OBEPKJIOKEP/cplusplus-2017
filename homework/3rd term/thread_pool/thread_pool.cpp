@@ -9,37 +9,35 @@
 #include "thread_pool.hpp"
 #include <iostream>
 
+void thread_pool::run()
+{
+    std::cout << "thread started\n";
+    do {
+        func current_func;
+        {
+            std::unique_lock<std::mutex> lk(m);
+            while (running && funcs.empty())
+                cv.wait(lk);
+            if (funcs.empty())
+                break;
+            current_func = funcs.front();
+            funcs.pop();
+        }
+        current_func();
+    } while (running);
+    std::cout << "thread finished\n";
+}
+
 thread_pool::thread_pool(std::size_t size)
 {
+    if (size == 0)
+    {
+        throw std::invalid_argument("nothing to do without threads");
+    }
+    running = true;
     for (std::size_t i = 0; i < size; ++i)
     {
-        threads.push_back(thread([this]()
-        {
-            {
-                //std::lock_guard<std::mutex> lg(m);
-                std::cout << "thread " << std::this_thread::get_id() << " started\n";
-            }
-            while (true)
-            {
-                std::unique_lock<std::mutex> lk(m);
-                if (funcs.empty())
-                {
-                    if (running)
-                        cv.wait(lk);
-                    else
-                    {
-                        std::cout << "done thread" << std::endl;
-                        return;
-                    }
-                }
-                auto current_func = funcs.front();
-                funcs.pop();
-                lk.unlock();
-                current_func();
-            }
-        }
-        ));
-        
+        threads.push_back(thread(&thread_pool::run, this));
     }
 }
 
