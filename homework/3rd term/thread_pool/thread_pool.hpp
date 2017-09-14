@@ -17,18 +17,17 @@
 typedef std::function<void()> func;
 using std::thread;
 
-class thread_pool
-{
+class thread_pool {
 public:
     explicit thread_pool(std::size_t);
     
     // no copy
-    thread_pool(const thread_pool&) =delete;
-    thread_pool& operator=(const thread_pool&) =delete;
+    thread_pool(const thread_pool&) = delete;
+    thread_pool& operator=(const thread_pool&) = delete;
 
     // no move
     thread_pool(thread_pool&&) =delete;
-    thread_pool& operator=(thread_pool&&) =delete;
+    thread_pool& operator=(thread_pool&&) = delete;
     
     void execute(const func&);
     
