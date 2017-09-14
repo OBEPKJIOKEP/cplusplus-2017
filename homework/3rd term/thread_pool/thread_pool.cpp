@@ -9,6 +9,24 @@
 #include "thread_pool.hpp"
 #include <iostream>
 
+thread_pool::thread_pool(std::size_t size)
+{
+    if (size == 0)
+        throw std::invalid_argument("nothing to do without threads");
+    
+    running = true;
+    
+    for (std::size_t i = 0; i < size; ++i)
+        threads.push_back(thread(&thread_pool::run, this));
+}
+
+void thread_pool::execute(const func& task)
+{
+    std::lock_guard<std::mutex> lk(m);
+    funcs.push(task);
+    cv.notify_one();
+}
+
 void thread_pool::run()
 {
     std::cout << "thread started\n";
@@ -26,28 +44,6 @@ void thread_pool::run()
         current_func();
     } while (running);
     std::cout << "thread finished\n";
-}
-
-thread_pool::thread_pool(std::size_t size)
-{
-    if (size == 0)
-    {
-        throw std::invalid_argument("nothing to do without threads");
-    }
-    running = true;
-    for (std::size_t i = 0; i < size; ++i)
-    {
-        threads.push_back(thread(&thread_pool::run, this));
-    }
-}
-
-void thread_pool::execute(const func& task)
-{
-    {
-        std::lock_guard<std::mutex> lk(m);
-        funcs.push(task);
-    }
-    cv.notify_one();
 }
 
 thread_pool::~thread_pool()

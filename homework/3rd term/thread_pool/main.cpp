@@ -43,6 +43,7 @@ int main(int argc, const char * argv[])
     a.execute(sleep3);
     a.execute(sleep15);
     sleep15();
+    a.execute(sleep1);
     return 0;
 }
 
