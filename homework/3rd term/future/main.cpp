@@ -12,23 +12,27 @@
 #include "shared_state.hpp"
 #include "future.hpp"
 #include "promise.hpp"
+#include "../../ThreadPool/ThreadPool/syncronized_ostream.hpp"
+
+syncronized_ostream s_cout(std::cout);
 
 int main(int argc, const char * argv[]) {
-    shared_state<int> ssi;
-    shared_state<float> ssf;
-    
-    future<int> fi;
-    future<float> ff;
-    
     promise<int> pi;
     promise<float> pf;
     
-    std::thread t([&](){
-        std::cout << "starting to sleep\n";
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::thread t0([&](){
+        s_cout << "starting to sleep\n";
+        std::this_thread::sleep_until(std::chrono::high_resolution_clock::now() + std::chrono::seconds(2));
         pi.set(1);
-        std::cout << "exiting thread\n";
+        s_cout << "exiting thread\n";
+    });
+    std::thread t1([&](){
+        s_cout << "starting to sleep\n";
+        std::this_thread::sleep_until(std::chrono::high_resolution_clock::now() + std::chrono::seconds(2));
+        pi.set(1);
+        s_cout << "exiting thread\n";
     });
     std::cout << pi.get_future().get() << std::endl;
-    t.join();
+    t0.join();
+    t1.join();
 }

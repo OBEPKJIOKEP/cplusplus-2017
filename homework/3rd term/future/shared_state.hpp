@@ -15,18 +15,13 @@
 using my_bool = std::atomic_bool;
 
 template <typename T>
-class shared_state {
-public:
+struct shared_state {
     shared_state() = default;
     
     std::mutex m;
     std::condition_variable cv;
     T value;
     my_bool is_ready;
-    
-    ~shared_state() {
-//        std::cout << "shared_state destructor\n";
-    }
 };
 
 #endif /* shared_state_hpp */

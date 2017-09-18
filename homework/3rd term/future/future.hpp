@@ -19,18 +19,20 @@ class promise;
 template <typename T>
 class future {
 public:
-    // TODO
-    future() = default;
+    // no copy
+    future(future &) = delete;
+    future& operator=(future &) = delete;
     
-    T get();
+    // move is allowed
+    future(future &&) = default;
+    future& operator=(future &&) = default;
     
-    void wait();
+    T get() const;
     
-    bool ready();
+    void wait() const;
     
-    ~future() {
-//        std::cout << "future destructor\n";
-    }
+    bool ready() const;
+    
 private:
     friend class promise<T>;
     
@@ -40,18 +42,23 @@ private:
 };
 
 template <typename T>
-T future<T>::get() {
+T future<T>::get() const {
     if (!_state->is_ready)
         wait();
     return _state->value;
 }
 
 template <typename T>
-void future<T>::wait() {
+void future<T>::wait() const {
     if (_state->is_ready)
         return;
     std::unique_lock<std::mutex> lk(_state->m);
     _state->cv.wait(lk);
+}
+
+template <typename T>
+bool future<T>::ready() const {
+    return _state->is_ready.load();
 }
 
 #endif /* future_hpp */
