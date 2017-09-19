@@ -36,26 +36,29 @@ public:
 private:
     friend class promise<T>;
     
-    future(std::shared_ptr<shared_state<T>> state) :_state {state} {};
+    explicit future(std::shared_ptr<shared_state<T>> state) :_state {state} {};
     
     std::shared_ptr<shared_state<T>> _state;
 };
 
+// get general template
 template <typename T>
 T future<T>::get() const {
-    if (!_state->is_ready)
-        wait();
+    wait();
     return _state->value;
 }
 
+// get() patrial specialization for void
 template<>
 void future<void>::get() const {
-    if (!_state->is_ready)
-        wait();
+    wait();
 }
 
 template <typename T>
 void future<T>::wait() const {
+    if (!_state)
+        throw std::runtime_error("future invalidated");
+    
     if (_state->is_ready)
         return;
     std::unique_lock<std::mutex> lk(_state->m);

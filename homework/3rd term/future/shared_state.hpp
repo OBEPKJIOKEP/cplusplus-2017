@@ -14,6 +14,7 @@
 
 using synced_bool = std::atomic_bool;
 
+// general shared_state template
 template <typename T>
 struct shared_state {
     shared_state() = default;
@@ -24,6 +25,8 @@ struct shared_state {
     synced_bool is_ready;
 };
 
+
+// shared state partial specialization for void 
 template <>
 struct shared_state<void> {
     shared_state() = default;

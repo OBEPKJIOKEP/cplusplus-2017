@@ -14,6 +14,7 @@
 #include "shared_state.hpp"
 #include "future.hpp"
 
+// promise general template
 template <typename T>
 class promise {
 public:
@@ -42,7 +43,10 @@ private:
 
 
 template <typename T>
-void promise<T>::set(const T & value) {
+void promise<T>::set(const T &value) {
+    if (!_state)
+        throw std::runtime_error("promise invalidated");
+    
     {
         std::lock_guard<std::mutex> lk {_state->m};
         if (_state->is_ready)
@@ -54,11 +58,23 @@ void promise<T>::set(const T & value) {
 }
 
 template <typename T>
-void promise<T>::set(const T && value) {
+void promise<T>::set(const T &&value) {
     set(value);
 }
 
+template <typename T>
+future<T> promise<T>::get_future() {
+    if (!_state)
+        throw std::runtime_error("promise invalidated");
+    
+    std::lock_guard<std::mutex> lk {_state->m};
+    if (_future_taken)
+        throw std::runtime_error("future taken twice");
+    _future_taken = true;
+    return future<T>(_state);
+}
 
+// promise partial specialization for void
 template<>
 class promise<void> {
 public:
@@ -90,20 +106,14 @@ void promise<void>::set() {
 }
 
 future<void> promise<void>::get_future() {
+    if (!_state)
+        throw std::runtime_error("promise invalidated");
+    
     std::lock_guard<std::mutex> lk {_state->m};
     if (_future_taken)
         throw std::runtime_error("future taken twice");
     _future_taken = true;
     return future<void>(_state);
-}
-
-template <typename T>
-future<T> promise<T>::get_future() {
-    std::lock_guard<std::mutex> lk {_state->m};
-    if (_future_taken)
-        throw std::runtime_error("future taken twice");
-    _future_taken = true;
-    return future<T>(_state);
 }
 
 #endif /* promise_hpp */
