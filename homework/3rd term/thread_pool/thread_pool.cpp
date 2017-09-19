@@ -18,8 +18,8 @@ thread_pool::thread_pool(std::size_t size) :running {true} {
         threads.emplace_back(&thread_pool::run, this);
 }
 
-void thread_pool::execute(const func& task) {
-    std::lock_guard<std::mutex> lk(m);
+void thread_pool::execute(const func &task) {
+    std::lock_guard<std::mutex> lk {m};
     funcs.push(task);
     cv.notify_one();
 }
@@ -29,7 +29,7 @@ void thread_pool::run() {
     do {
         func current_func;
         {
-            std::unique_lock<std::mutex> lk(m);
+            std::unique_lock<std::mutex> lk {m};
             cv.wait(lk, [this](){ return !(running && funcs.empty()); });
             if (funcs.empty())
                 break;

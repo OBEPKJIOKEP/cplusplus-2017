@@ -13,7 +13,7 @@
 
 class syncronized_ostream {
 public:
-    explicit syncronized_ostream(std::ostream& os)
+    explicit syncronized_ostream(std::ostream &os)
         :ostream {os}
     {};
     
@@ -26,7 +26,7 @@ public:
     syncronized_ostream& operator=(syncronized_ostream&&) = delete;
     
     template <typename T>
-    syncronized_ostream& operator<<(const T& other) {
+    syncronized_ostream& operator<<(const T &other) {
         std::lock_guard<std::mutex> lk(ostream_mutex);
         ostream << other;
         return *this;
@@ -39,16 +39,16 @@ public:
     }
     
 private:
-    std::ostream& ostream;
+    std::ostream &ostream;
     std::mutex ostream_mutex;
     
     template <typename Head, typename ...Tail>
-    void build_string(std::stringstream& sstream, const Head head, const Tail... tail) {
+    void build_string(std::stringstream &sstream, const Head &head, const Tail &...tail) {
         sstream << head;
         build_string(sstream, tail...);
     }
     
-    void build_string(std::stringstream& sstream) {
+    void build_string(std::stringstream &sstream) {
         sstream << '\n';
     }
 };
