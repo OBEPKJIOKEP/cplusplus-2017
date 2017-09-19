@@ -48,6 +48,12 @@ T future<T>::get() const {
     return _state->value;
 }
 
+template<>
+void future<void>::get() const {
+    if (!_state->is_ready)
+        wait();
+}
+
 template <typename T>
 void future<T>::wait() const {
     if (_state->is_ready)

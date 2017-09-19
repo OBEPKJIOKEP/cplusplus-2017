@@ -12,7 +12,7 @@
 #include <condition_variable>
 #include <atomic>
 
-using my_bool = std::atomic_bool;
+using synced_bool = std::atomic_bool;
 
 template <typename T>
 struct shared_state {
@@ -21,7 +21,16 @@ struct shared_state {
     std::mutex m;
     std::condition_variable cv;
     T value;
-    my_bool is_ready;
+    synced_bool is_ready;
+};
+
+template <>
+struct shared_state<void> {
+    shared_state() = default;
+    
+    std::mutex m;
+    std::condition_variable cv;
+    synced_bool is_ready;
 };
 
 #endif /* shared_state_hpp */

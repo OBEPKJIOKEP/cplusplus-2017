@@ -48,5 +48,7 @@ private:
         build_string(sstream, tail...);
     }
     
-    void build_string(std::stringstream& sstream) {}
+    void build_string(std::stringstream& sstream) {
+        sstream << '\n';
+    }
 };

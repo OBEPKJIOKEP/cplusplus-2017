@@ -20,18 +20,22 @@ int main(int argc, const char * argv[]) {
     promise<int> pi;
     promise<float> pf;
     
-    std::thread t0([&](){
-        s_cout << "starting to sleep\n";
+    promise<void> pv;
+//    auto vf = pv.get_future();
+    
+    std::thread t0 {[&](){
+        s_cout.print_pack("starting to sleep");
         std::this_thread::sleep_until(std::chrono::high_resolution_clock::now() + std::chrono::seconds(2));
-        pi.set(1);
-        s_cout << "exiting thread\n";
-    });
-    std::thread t1([&](){
-        s_cout << "starting to sleep\n";
+        pv.get_future().get();
+        s_cout.print_pack("exiting thread");
+    }};
+    std::thread t1 {[&](){
+        s_cout.print_pack("starting to sleep");
         std::this_thread::sleep_until(std::chrono::high_resolution_clock::now() + std::chrono::seconds(2));
-        pi.set(1);
-        s_cout << "exiting thread\n";
-    });
+//        pv.get_future();
+        s_cout.print_pack("exiting thread");
+    }};
+    pv.set();
     std::cout << pi.get_future().get() << std::endl;
     t0.join();
     t1.join();

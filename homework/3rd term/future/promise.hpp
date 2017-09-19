@@ -37,15 +37,14 @@ public:
     
 private:
     std::shared_ptr<shared_state<T>> _state;
-    my_bool _future_taken;
+    synced_bool _future_taken;
 };
+
 
 template <typename T>
 void promise<T>::set(const T & value) {
-    if (_state->is_ready)
-        throw std::runtime_error("value already set");
     {
-        std::lock_guard<std::mutex> lk(_state->m);
+        std::lock_guard<std::mutex> lk {_state->m};
         if (_state->is_ready)
             throw std::runtime_error("value already set");
         _state->value = value;
@@ -59,11 +58,48 @@ void promise<T>::set(const T && value) {
     set(value);
 }
 
-template <typename T>
-future<T> promise<T>::get_future() {
+
+template<>
+class promise<void> {
+public:
+    promise() :
+    _state {new shared_state<void>()},
+    _future_taken {false}
+    {};
+    
+    // no copy
+    promise(promise &) = delete;
+    promise& operator=(promise &) = delete;
+    
+    // move is allowed
+    promise(promise &&) = default;
+    promise& operator=(promise &&) = default;
+    
+    void set();
+    
+    future<void> get_future();
+    
+private:
+    std::shared_ptr<shared_state<void>> _state;
+    synced_bool _future_taken;
+};
+
+void promise<void>::set() {
+    _state->is_ready = true;
+    _state->cv.notify_one();
+}
+
+future<void> promise<void>::get_future() {
+    std::lock_guard<std::mutex> lk {_state->m};
     if (_future_taken)
         throw std::runtime_error("future taken twice");
-    std::lock_guard<std::mutex> lk(_state->m);
+    _future_taken = true;
+    return future<void>(_state);
+}
+
+template <typename T>
+future<T> promise<T>::get_future() {
+    std::lock_guard<std::mutex> lk {_state->m};
     if (_future_taken)
         throw std::runtime_error("future taken twice");
     _future_taken = true;
